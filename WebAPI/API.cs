@@ -170,6 +170,13 @@ namespace WebAPIPlugin
                     HTTPServer.Write(client, response);
                 }
             }
+            else if(request[0] == "server")
+            {
+                if(request.Length >= 2 && request[1] == "info")
+                {
+                    // soon
+                }
+            }
         }
     }
 }

@@ -26,18 +26,22 @@ namespace WebAPIPlugin
     public class HTTPServer
     {
         public HttpListener listener;
+        public List<string> WhitelistIPs;
 
-        public string host;
-        public short port;
-
-        public HTTPServer(string _host, short _port)
+        public HTTPServer()
         {
-            host = _host;
-            port = _port;
-
             listener = new HttpListener();
             listener.Prefixes.Add("http://*:" + WebAPI.dis.Configuration.Port + "/");
             listener.Start();
+
+            WhitelistIPs = new List<string>() { };
+            if(WebAPI.dis.Configuration.WhitelistIPs.Count > 0)
+            {
+                foreach(var ip in WebAPI.dis.Configuration.WhitelistIPs)
+                {
+                    WhitelistIPs.Add(ip.IP);
+                }
+            }
 
             AsyncCallback callback = null;
             callback = ar =>
@@ -53,12 +57,12 @@ namespace WebAPIPlugin
 
         public void ProcessClient(HttpListenerContext client)
         {
-            string path = client.Request.Url.AbsolutePath.Trim();
-            if(path == "/" || path == "/index.html")
+            if(this.WhitelistIPs.Count > 0 && !this.WhitelistIPs.Contains(client.Request.RemoteEndPoint.Address.ToString()))
             {
-                Write(client, "You are in the wrong place.", HttpStatusCode.Forbidden);
+                Write(client, "Error: Access denied.\r\nYour IP is not whitelisted.", HttpStatusCode.Forbidden);
             }
-            else if(path == "/api" || path == "/api/")
+            string path = client.Request.Url.AbsolutePath.Trim();
+            if(path == "/api" || path == "/api/")
             {
                 Write(client, "Valid area, but under construction.");
             }
@@ -68,8 +72,8 @@ namespace WebAPIPlugin
             }
             else
             {
-                Write(client, "File not found.", HttpStatusCode.NotFound);
-            }
+                Write(client, "You are in the wrong place.", HttpStatusCode.Forbidden);
+            } 
             client.Response.OutputStream.Close();
         }
 

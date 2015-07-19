@@ -37,7 +37,7 @@ namespace WebAPIPlugin
                 return;
             }
 
-            httpserver = new HTTPServer("0.0.0.0", this.Configuration.Port);
+            httpserver = new HTTPServer();
             
         }
 
