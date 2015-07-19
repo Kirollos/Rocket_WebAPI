@@ -43,7 +43,10 @@ namespace WebAPIPlugin
 
         protected override void Unload()
         {
-            
+            if(this.Configuration.Enabled)
+            {
+                httpserver.listener.Stop();
+            }
         }
     }
 }
