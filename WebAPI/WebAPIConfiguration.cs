@@ -31,7 +31,7 @@ namespace WebAPIPlugin
         public string AuthType;
         public int maxconnections;
 
-        [XmlArrayItem(ElementName = "WhitelistIP")]
+        [XmlArrayItem(ElementName = "IP")] // WhitelistIP was not good ok
         public List<WebAPI_WhitelistIP> WhitelistIPs;
 
         public IRocketPluginConfiguration DefaultConfiguration
@@ -49,12 +49,11 @@ namespace WebAPIPlugin
                 };
             }
         }
-
-        public class WebAPI_WhitelistIP
-        {
-            [XmlText()]
-            public string IP;
-            WebAPI_WhitelistIP() { IP = ""; }
-        }
+    }
+    public class WebAPI_WhitelistIP
+    {
+        [XmlText()]
+        public string IP;
+        WebAPI_WhitelistIP() { IP = ""; }
     }
 }
