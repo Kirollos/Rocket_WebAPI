@@ -64,14 +64,9 @@ namespace WebAPIPlugin
             }
             else if (WebAPI.dis.Configuration.AuthType == "GETQuery")
             {
-                int indexofpass = client.Request.Url.Query.IndexOf("auth=", StringComparison.OrdinalIgnoreCase);
-                if(indexofpass > -1)
+                string pass = uAPI.GetFromQuery(client.Request.Url.Query, "auth");
+                if(pass != null)
                 {
-                    int indexofequal = client.Request.Url.Query.IndexOf('=', indexofpass);
-                    int indexofamp = client.Request.Url.Query.IndexOf("&", indexofpass);
-
-                    string pass = (indexofamp != -1) ? client.Request.Url.Query.Substring(indexofequal + 1, indexofamp-indexofequal-1) : client.Request.Url.Query.Substring(indexofequal + 1);
-                    
                     if(pass != WebAPI.dis.Configuration.UserPass)
                     {
                         /*{
@@ -202,6 +197,25 @@ namespace WebAPIPlugin
                     HTTPServer.Write(client, response);
                 }
             }
+        }
+
+        public static string GetFromQuery(string query, string name)
+        {
+            if (query.Length < 1)
+                return null;
+            query = query.Remove(0, 1); // remove the ?
+            string[] queryarr = query.Trim().Split(new[] { "&" }, StringSplitOptions.RemoveEmptyEntries);
+            foreach (var k in queryarr) Logger.Log(k);
+            List<string> queryarr_ = queryarr.ToList<string>();
+            foreach (var k in queryarr_) Logger.LogWarning(k);
+            foreach (var element in queryarr_)
+            {
+                if (element.Contains(name) && element.Contains('='))
+                {
+                    return element.Trim().Split(new[] { '=' })[1];
+                }
+            }
+            return null;
         }
     }
 }
