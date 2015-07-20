@@ -46,6 +46,7 @@ namespace WebAPIPlugin
             if(this.Configuration.Enabled)
             {
                 httpserver.listener.Stop();
+                httpserver.listener.Abort();
             }
         }
     }

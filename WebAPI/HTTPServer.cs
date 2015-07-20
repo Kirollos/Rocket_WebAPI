@@ -46,6 +46,8 @@ namespace WebAPIPlugin
             AsyncCallback callback = null;
             callback = ar =>
                  {
+                     if (!listener.IsListening)
+                         return;
                      this.ProcessClient(
                      listener.EndGetContext(ar)
                      );
@@ -56,11 +58,14 @@ namespace WebAPIPlugin
 
         public void ProcessClient(HttpListenerContext client)
         {
+            string path = client.Request.Url.AbsolutePath.Trim();
             if(this.WhitelistIPs.Count > 0 && !this.WhitelistIPs.Contains(client.Request.RemoteEndPoint.Address.ToString()))
             {
                 Write(client, "Error: Access denied.\r\nYour IP is not whitelisted.", HttpStatusCode.Forbidden);
+                client.Response.OutputStream.Close();
+                Logger.LogWarning("WebAPI Warning: Client (" + client.Request.RemoteEndPoint.ToString() + ") failed to send request to " + path + ".");
+                return;
             }
-            string path = client.Request.Url.AbsolutePath.Trim();
             if(path == "/api" || path == "/api/")
             {
                 Write(client, "Valid area, but under construction.");
