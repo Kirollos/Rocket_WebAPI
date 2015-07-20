@@ -49,7 +49,6 @@ namespace WebAPIPlugin
                      this.ProcessClient(
                      listener.EndGetContext(ar)
                      );
-                     Logger.LogWarning("done");
                      listener.BeginGetContext(callback, null);
                  };
             listener.BeginGetContext(callback, null);
@@ -75,6 +74,7 @@ namespace WebAPIPlugin
                 Write(client, "You are in the wrong place.", HttpStatusCode.Forbidden);
             } 
             client.Response.OutputStream.Close();
+            Logger.Log("Client ("+client.Request.RemoteEndPoint.ToString()+") requested " + path);
         }
 
         public static void Write(HttpListenerContext client, string message, HttpStatusCode sc = HttpStatusCode.OK)

@@ -174,7 +174,39 @@ namespace WebAPIPlugin
             {
                 if(request.Length >= 2 && request[1] == "info")
                 {
-                    // soon
+                    Logger.LogWarning("a");
+                    responsejson.Add("status", "success");
+                    Dictionary<string, object> sa = new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase) { };
+                    Dictionary<string, object> finalsa = new Dictionary<string, object>() { };
+                    Logger.LogWarning("b");
+                    sa.Add("InstanceName", Steam.InstanceName);
+                    Logger.LogWarning("b1");
+                    sa.Add("IsPassworded", !String.IsNullOrEmpty(Steam.serverPassword));
+                    Logger.LogWarning("b2");
+                    sa.Add("IsPVP", Steam.isPvP);
+                    Logger.LogWarning("b3");
+                    sa.Add("SecurityType", Steam.security.ToString());
+                    sa.Add("Map", Steam.map);
+                    sa.Add("Players", Steam.Players.Count);
+                    sa.Add("MaxPlayers", Steam.maxPlayers);
+                    sa.Add("Mode", Steam.mode.ToString());
+                    sa.Add("Name", Steam.serverName);
+                    Logger.LogWarning("c");
+                    if ((request.Length == 3 && (request[2] == "all" || String.IsNullOrEmpty(request[2]))) || request.Length == 2)
+                        responsejson.Add("response", new Dictionary<string, object>() { {"serverinfo", sa} });
+                    else if(request.Length == 3)
+                    {
+                        var fields = request[2].Trim().Split(new[] { "," }, StringSplitOptions.RemoveEmptyEntries);
+                        foreach (var field in fields)
+                        {
+                            if (!sa.ContainsKey(field))
+                                continue;
+                            finalsa.Add(field, sa[field]);
+                        }
+                        responsejson.Add("response", new Dictionary<string, object>() { { "serverinfo", finalsa } });
+                    }
+                    Logger.LogWarning("d");
+                    HTTPServer.Write(client, response);
                 }
             }
         }
