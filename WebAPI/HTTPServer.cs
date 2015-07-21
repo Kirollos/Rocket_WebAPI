@@ -74,6 +74,39 @@ namespace WebAPIPlugin
             {
                 uAPI.Parse(client, path);
             }
+            else if(path == "/panel" || path.StartsWith("/panel/"))
+            {
+                string f, t = "text/html";
+
+                if(path == "/panel" || path == "/panel/")
+                {
+                    f = "index.html";
+                }
+                else
+                {
+                    f = path.Remove(0, "/panel".Length);
+                }
+                string data;
+
+                try
+                {
+                    data = File.ReadAllText(WebAPI.WebPanelFiles + f);
+                }
+                catch
+                {
+                    Write(client, "File not found.", HttpStatusCode.NotFound);
+                    return;
+                }
+
+                if (path.EndsWith(".html") || path.EndsWith(".htm"))
+                    t = "text/html";
+                if (path.EndsWith(".css"))
+                    t = "text/css";
+                if (path.EndsWith(".js") || path.EndsWith(".json"))
+                    t = "application/javascript";
+
+                Write(client, data, HttpStatusCode.OK, t);
+            }
             else
             {
                 Write(client, "You are in the wrong place.", HttpStatusCode.Forbidden);
@@ -82,11 +115,11 @@ namespace WebAPIPlugin
             Logger.Log("Client ("+client.Request.RemoteEndPoint.ToString()+") requested " + path);
         }
 
-        public static void Write(HttpListenerContext client, string message, HttpStatusCode sc = HttpStatusCode.OK)
+        public static void Write(HttpListenerContext client, string message, HttpStatusCode sc = HttpStatusCode.OK, string ContentType = "text/html")
         {
             client.Response.StatusCode = (int)sc;
             client.Response.ContentLength64 = message.Length;
-            client.Response.ContentType = "text/html";
+            client.Response.ContentType = ContentType;
             client.Response.OutputStream.Write(new UTF8Encoding().GetBytes(message), 0, message.Length);
         }
     }

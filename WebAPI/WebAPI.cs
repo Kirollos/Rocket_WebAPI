@@ -25,6 +25,7 @@ namespace WebAPIPlugin
 {
     public class WebAPI : RocketPlugin<WebAPIConfiguration>
     {
+        public static string WebPanelFiles { get { return Rocket.Unturned.Implementation.Instance.HomeFolder + "/WebPanelFiles/"; } }
         public static WebAPI dis = null;
         public HTTPServer httpserver;
 
@@ -38,6 +39,12 @@ namespace WebAPIPlugin
             }
 
             httpserver = new HTTPServer();
+
+            if(this.Configuration.WebPanel)
+            {
+                if (!Directory.Exists(WebPanelFiles))
+                    Directory.CreateDirectory(WebPanelFiles);
+            }
             
         }
 

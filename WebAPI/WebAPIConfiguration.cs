@@ -30,6 +30,7 @@ namespace WebAPIPlugin
         public string UserPass;
         public string AuthType;
         public int maxconnections;
+        public bool WebPanel;
 
         [XmlArrayItem(ElementName = "IP")] // WhitelistIP was not good ok
         public List<WebAPI_WhitelistIP> WhitelistIPs;
@@ -45,6 +46,7 @@ namespace WebAPIPlugin
                     UserPass = "user:pass",
                     AuthType = "GETQuery",
                     maxconnections = 5,
+                    WebPanel = false,
                     WhitelistIPs = new List<WebAPI_WhitelistIP>() {}
                 };
             }
