@@ -27,6 +27,7 @@ namespace WebAPIPlugin
     {
         public HttpListener listener;
         public List<string> WhitelistIPs;
+        public static Dictionary<string, DateTime> sessions = new Dictionary<string, DateTime>() { };
 
         public HTTPServer()
         {
@@ -121,6 +122,25 @@ namespace WebAPIPlugin
             client.Response.ContentLength64 = message.Length;
             client.Response.ContentType = ContentType;
             client.Response.OutputStream.Write(new UTF8Encoding().GetBytes(message), 0, message.Length);
+        }
+
+        /*
+         * Idea based on (http://stackoverflow.com/questions/730268/unique-random-string-generation)
+         */
+
+        public static string GenerateSessionID(HttpListenerContext client)
+        {
+            StringBuilder final = new StringBuilder();
+            final.Append(client.Request.RemoteEndPoint.Address.ToString() + "|");
+            final.Append(DateTime.Now);
+            int len = final.Length;
+            System.Random random = new System.Random();
+
+            for(;final.Length < len + 10;)
+            {
+                final.Append(Convert.ToChar(Convert.ToInt32(Math.Floor(26*random.NextDouble() + 65))));
+            }
+            return final.ToString();
         }
     }
 }
