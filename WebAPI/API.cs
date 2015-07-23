@@ -154,6 +154,8 @@ namespace WebAPIPlugin
                         pa.Add("Stamina", p.Stamina);
                         pa.Add("SteamGroupID", p.SteamGroupID.ToString());
                         pa.Add("Thirst", p.Thirst);
+                        pa.Add("Groups", p.GetGroups(true));
+                        pa.Add("Permissions", p.Permissions);
 
                         if((request.Length == 3 && (request[2] == "all" || String.IsNullOrEmpty(request[2]))) || request.Length == 2)
                             finalarr.Add(pa);
