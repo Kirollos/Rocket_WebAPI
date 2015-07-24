@@ -29,6 +29,22 @@ namespace WebAPIPlugin
         public List<string> WhitelistIPs;
         public static Dictionary<string, DateTime> sessions = new Dictionary<string, DateTime>() { };
 
+        private Dictionary<string, string> extensions = new Dictionary<string, string>()
+        {
+            { "htm", "text/html" },
+            { "html", "text/html" },
+            { "js", "application/javascript"},
+            { "json", "application/javascript"},
+            { "xml", "text/xml" },
+            { "txt", "text/plain" },
+            { "css", "text/css" },
+            { "png", "image/png" },
+            { "gif", "image/gif" },
+            { "jpg", "image/jpg" },
+            { "jpeg", "image/jpeg" },
+            { "zip", "application/zip"}
+        };
+
         public HTTPServer()
         {
             listener = new HttpListener();
@@ -49,9 +65,12 @@ namespace WebAPIPlugin
                  {
                      if (!listener.IsListening)
                          return;
-                     this.ProcessClient(
-                     listener.EndGetContext(ar)
-                     );
+                     new Thread(() =>
+                     {
+                         this.ProcessClient(
+                         listener.EndGetContext(ar)
+                         );
+                     }).Start();
                      listener.BeginGetContext(callback, null);
                  };
             listener.BeginGetContext(callback, null);
@@ -67,6 +86,8 @@ namespace WebAPIPlugin
                 Logger.LogWarning("WebAPI Warning: Client (" + client.Request.RemoteEndPoint.ToString() + ") failed to send request to " + path + ".");
                 return;
             }
+            client.Response.Headers.Add("Access-Control-Allow-Origin: *");
+            client.Response.Headers.Add("Access-Control-Allow-Credentials: true");
             if(path == "/api" || path == "/api/")
             {
                 Write(client, "Valid area, but under construction.");
@@ -77,36 +98,40 @@ namespace WebAPIPlugin
             }
             else if(path == "/panel" || path.StartsWith("/panel/"))
             {
-                string f, t = "text/html";
+                string f = "", t = "text/html";
 
                 if(path == "/panel" || path == "/panel/")
                 {
-                    f = "index.html";
+                    //f = "index.html";
+                    client.Response.Headers.Add("Location: /panel/index.html");
+                    Write(client, "", HttpStatusCode.Redirect);
+                    client.Response.OutputStream.Close();
+                    return;
                 }
                 else
                 {
                     f = path.Remove(0, "/panel".Length);
                 }
-                string data;
+
+                foreach (var ext in extensions)
+                {
+                    if (path.EndsWith(ext.Key))
+                    {
+                        t = ext.Value;
+                        break;
+                    }
+                    t = "text/plain";
+                }
 
                 try
                 {
-                    data = File.ReadAllText(WebAPI.WebPanelFiles + f);
+                    Write(client, File.ReadAllBytes(WebAPI.WebPanelFiles + f), HttpStatusCode.OK, t);
                 }
                 catch
                 {
                     Write(client, "File not found.", HttpStatusCode.NotFound);
                     return;
                 }
-
-                if (path.EndsWith(".html") || path.EndsWith(".htm"))
-                    t = "text/html";
-                if (path.EndsWith(".css"))
-                    t = "text/css";
-                if (path.EndsWith(".js") || path.EndsWith(".json"))
-                    t = "application/javascript";
-
-                Write(client, data, HttpStatusCode.OK, t);
             }
             else
             {
@@ -122,6 +147,14 @@ namespace WebAPIPlugin
             client.Response.ContentLength64 = message.Length;
             client.Response.ContentType = ContentType;
             client.Response.OutputStream.Write(new UTF8Encoding().GetBytes(message), 0, message.Length);
+        }
+
+        public static void Write(HttpListenerContext client, byte[] message, HttpStatusCode sc = HttpStatusCode.OK, string ContentType = "text/html")
+        {
+            client.Response.StatusCode = (int)sc;
+            client.Response.ContentLength64 = message.Length;
+            client.Response.ContentType = ContentType;
+            client.Response.OutputStream.Write(message, 0, message.Length);
         }
 
         /*
