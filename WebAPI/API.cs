@@ -175,6 +175,250 @@ namespace WebAPIPlugin
                     responsejson.Add("response", new Dictionary<string, List<Dictionary<string, object>>>(){{"players", finalarr}});
                     HTTPServer.Write(client, response);
                 }
+                else if(request[1] == "kick")
+                {
+                    UnturnedPlayer p = null;
+                    if (request.Length >= 3)
+                    {
+                        string _cn, _sn, _sid, _rs;
+                        switch (request[2])
+                        {
+                            case "steamid":
+                                p = UnturnedPlayer.FromName(request[3]);
+                                if (p == null)
+                                {
+                                    responsejson.Add("status", "error");
+                                    responsejson.Add("response", new Dictionary<string, string>() { { "error", "Player not found." } });
+                                    HTTPServer.Write(client, response);
+                                    break;
+                                }
+                                _cn = p.CharacterName;
+                                _sn = p.SteamName;
+                                _sid = p.CSteamID.ToString();
+                                _rs = request.Length == 5 ? request[4] : "Kicked via WebAPI";
+                                p.Kick(_rs);
+                                responsejson.Add("status", "success");
+                                responsejson.Add("response", new Dictionary<string, string>()
+                                {
+                                    { "kCharacterName", _cn },
+                                    { "kSteamName", _sn },
+                                    { "kSteamID", _sid },
+                                    { "kReason", _rs }
+                                });
+                                HTTPServer.Write(client, response);
+                                break;
+                            case "steamname":
+                                p = UnturnedPlayer.FromName(request[3]);
+                                if (p == null)
+                                {
+                                    responsejson.Add("status", "error");
+                                    responsejson.Add("response", new Dictionary<string, string>() { { "error", "Player not found." } });
+                                    HTTPServer.Write(client, response);
+                                    break;
+                                }
+                                _cn = p.CharacterName;
+                                _sn = p.SteamName;
+                                _sid = p.CSteamID.ToString();
+                                _rs = request.Length == 5 ? request[4] : "Kicked via WebAPI";
+                                p.Kick(_rs);
+                                responsejson.Add("status", "success");
+                                responsejson.Add("response", new Dictionary<string, string>()
+                                {
+                                    { "kCharacterName", _cn },
+                                    { "kSteamName", _sn },
+                                    { "kSteamID", _sid },
+                                    { "kReason", _rs }
+                                });
+                                HTTPServer.Write(client, response);
+                                break;
+                            case "charactername":
+                                p = UnturnedPlayer.FromName(request[3]);
+                                if (p == null)
+                                {
+                                    responsejson.Add("status", "error");
+                                    responsejson.Add("response", new Dictionary<string, string>() { { "error", "Player not found." } });
+                                    HTTPServer.Write(client, response);
+                                    break;
+                                }
+                                _cn = p.CharacterName;
+                                _sn = p.SteamName;
+                                _sid = p.CSteamID.ToString();
+                                _rs = request.Length == 5 ? request[4] : "Kicked via WebAPI";
+                                p.Kick(_rs);
+                                responsejson.Add("status", "success");
+                                responsejson.Add("response", new Dictionary<string, string>()
+                                {
+                                    { "kCharacterName", _cn },
+                                    { "kSteamName", _sn },
+                                    { "kSteamID", _sid },
+                                    { "kReason", _rs }
+                                });
+                                HTTPServer.Write(client, response);
+                                break;
+                            case "id":
+                                p = UnturnedPlayer.FromSteamPlayer(Steam.Players[int.Parse(request[3])]);
+                                if (p == null)
+                                {
+                                    responsejson.Add("status", "error");
+                                    responsejson.Add("response", new Dictionary<string, string>() { { "error", "Player not found." } });
+                                    HTTPServer.Write(client, response);
+                                    break;
+                                }
+                                _cn = p.CharacterName;
+                                _sn = p.SteamName;
+                                _sid = p.CSteamID.ToString();
+                                _rs = request.Length == 5 ? request[4] : "Kicked via WebAPI";
+                                p.Kick(_rs);
+                                responsejson.Add("status", "success");
+                                responsejson.Add("response", new Dictionary<string, string>()
+                                {
+                                    { "kCharacterName", _cn },
+                                    { "kSteamName", _sn },
+                                    { "kSteamID", _sid },
+                                    { "kReason", _rs }
+                                });
+                                HTTPServer.Write(client, response);
+                                break;
+                            default:
+                                responsejson.Add("status", "error");
+                                responsejson.Add("response", new Dictionary<string, string>() { { "error", "Invalid type. Supported types: steamname/steamid/charactername/id" } });
+                                HTTPServer.Write(client, response);
+                                break;
+                        }
+                    }
+                    else
+                    {
+                        responsejson.Add("status", "error");
+                        responsejson.Add("response", new Dictionary<string, string>() { { "error", "Missing Parameters." } });
+                        HTTPServer.Write(client, response);
+                    }
+                }
+                else if (request[1] == "ban")
+                {
+                    UnturnedPlayer p = null;
+                    if (request.Length >= 3)
+                    {
+                        string _cn, _sn, _sid, _rs, _du;
+                        switch (request[2])
+                        {
+                            case "steamid":
+                                p = UnturnedPlayer.FromName(request[3]);
+                                if (p == null)
+                                {
+                                    responsejson.Add("status", "error");
+                                    responsejson.Add("response", new Dictionary<string, string>() { { "error", "Player not found." } });
+                                    HTTPServer.Write(client, response);
+                                    break;
+                                }
+                                _cn = p.CharacterName;
+                                _sn = p.SteamName;
+                                _sid = p.CSteamID.ToString();
+                                _rs = request.Length == 6 ? request[5] : "Banned via WebAPI";
+                                _du = request[4];
+                                p.Ban(_rs, uint.Parse(_du));
+                                responsejson.Add("status", "success");
+                                responsejson.Add("response", new Dictionary<string, string>()
+                                {
+                                    { "bCharacterName", _cn },
+                                    { "bSteamName", _sn },
+                                    { "bSteamID", _sid },
+                                    { "bDuration", _du },
+                                    { "bReason", _rs }
+                                });
+                                HTTPServer.Write(client, response);
+                                break;
+                            case "steamname":
+                                p = UnturnedPlayer.FromName(request[3]);
+                                if (p == null)
+                                {
+                                    responsejson.Add("status", "error");
+                                    responsejson.Add("response", new Dictionary<string, string>() { { "error", "Player not found." } });
+                                    HTTPServer.Write(client, response);
+                                    break;
+                                }
+                                _cn = p.CharacterName;
+                                _sn = p.SteamName;
+                                _sid = p.CSteamID.ToString();
+                                _rs = request.Length == 6 ? request[5] : "Banned via WebAPI";
+                                _du = request[4];
+                                p.Ban(_rs, uint.Parse(_du));
+                                responsejson.Add("status", "success");
+                                responsejson.Add("response", new Dictionary<string, string>()
+                                {
+                                    { "bCharacterName", _cn },
+                                    { "bSteamName", _sn },
+                                    { "bSteamID", _sid },
+                                    { "bDuration", _du },
+                                    { "bReason", _rs }
+                                });
+                                HTTPServer.Write(client, response);
+                                break;
+                            case "charactername":
+                                p = UnturnedPlayer.FromName(request[3]);
+                                if (p == null)
+                                {
+                                    responsejson.Add("status", "error");
+                                    responsejson.Add("response", new Dictionary<string, string>() { { "error", "Player not found." } });
+                                    HTTPServer.Write(client, response);
+                                    break;
+                                }
+                                _cn = p.CharacterName;
+                                _sn = p.SteamName;
+                                _sid = p.CSteamID.ToString();
+                                _rs = request.Length == 6 ? request[5] : "Banned via WebAPI";
+                                _du = request[4];
+                                p.Ban(_rs, uint.Parse(_du));
+                                responsejson.Add("status", "success");
+                                responsejson.Add("response", new Dictionary<string, string>()
+                                {
+                                    { "bCharacterName", _cn },
+                                    { "bSteamName", _sn },
+                                    { "bSteamID", _sid },
+                                    { "bDuration", _du },
+                                    { "bReason", _rs }
+                                });
+                                HTTPServer.Write(client, response);
+                                break;
+                            case "id":
+                                p = UnturnedPlayer.FromSteamPlayer(Steam.Players[int.Parse(request[3])]);
+                                if (p == null)
+                                {
+                                    responsejson.Add("status", "error");
+                                    responsejson.Add("response", new Dictionary<string, string>() { { "error", "Player not found." } });
+                                    HTTPServer.Write(client, response);
+                                    break;
+                                }
+                                _cn = p.CharacterName;
+                                _sn = p.SteamName;
+                                _sid = p.CSteamID.ToString();
+                                _rs = request.Length == 6 ? request[5] : "Banned via WebAPI";
+                                _du = request[4];
+                                p.Ban(_rs, uint.Parse(_du));
+                                responsejson.Add("status", "success");
+                                responsejson.Add("response", new Dictionary<string, string>()
+                                {
+                                    { "bCharacterName", _cn },
+                                    { "bSteamName", _sn },
+                                    { "bSteamID", _sid },
+                                    { "bDuration", _du },
+                                    { "bReason", _rs }
+                                });
+                                HTTPServer.Write(client, response);
+                                break;
+                            default:
+                                responsejson.Add("status", "error");
+                                responsejson.Add("response", new Dictionary<string, string>() { { "error", "Invalid type. Supported types: steamname/steamid/charactername/id" } });
+                                HTTPServer.Write(client, response);
+                                break;
+                        }
+                    }
+                    else
+                    {
+                        responsejson.Add("status", "error");
+                        responsejson.Add("response", new Dictionary<string, string>() { { "error", "Missing Parameters." } });
+                        HTTPServer.Write(client, response);
+                    }
+                }
             }
             else if(request[0] == "server")
             {
