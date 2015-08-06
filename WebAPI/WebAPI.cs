@@ -39,8 +39,6 @@ namespace WebAPIPlugin
                 return;
             }
 
-            Logger.LogError(WebPanelFiles);
-
             httpserver = new HTTPServer();
 
             if(this.Configuration.Instance.WebPanel)
