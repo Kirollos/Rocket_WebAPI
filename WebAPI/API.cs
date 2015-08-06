@@ -14,7 +14,8 @@ using System.Text.RegularExpressions;
 using System.Xml.Serialization;
 using Rocket.API;
 using Rocket.Unturned;
-using Rocket.Unturned.Logging;
+using Rocket.Core.Logging;
+using Rocket.Core.Plugins;
 using Rocket.Unturned.Plugins;
 using Rocket.Unturned.Player;
 using SDG.Unturned;
@@ -130,7 +131,7 @@ namespace WebAPIPlugin
                     {
                         Dictionary<string, object> pa = new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase) { };
                         Dictionary<string, object> finalpa = new Dictionary<string, object>() { };
-                        RocketPlayer p = RocketPlayer.FromSteamPlayer(player);
+                        UnturnedPlayer p = UnturnedPlayer.FromSteamPlayer(player);
                         pa.Add("SteamID", p.CSteamID.ToString());
                         pa.Add("SteamName", p.SteamName);
                         pa.Add("CharacterName", p.CharacterName);
@@ -154,8 +155,8 @@ namespace WebAPIPlugin
                         pa.Add("Stamina", p.Stamina);
                         pa.Add("SteamGroupID", p.SteamGroupID.ToString());
                         pa.Add("Thirst", p.Thirst);
-                        pa.Add("Groups", p.GetGroups(true));
-                        pa.Add("Permissions", p.Permissions);
+                        pa.Add("Groups", Rocket.Core.R.Permissions.GetGroups(p, true));
+                        pa.Add("Permissions", p.GetPermissions());
 
                         if((request.Length == 3 && (request[2] == "all" || String.IsNullOrEmpty(request[2]))) || request.Length == 2)
                             finalarr.Add(pa);
@@ -288,7 +289,7 @@ namespace WebAPIPlugin
                 }
             }
 
-            if (WebAPI.dis.Configuration.AuthType == "HTTPAuth")
+            if (WebAPI.dis.Configuration.Instance.AuthType == "HTTPAuth")
             {
                 if (!client.Request.Headers.AllKeys.Contains("Authorization"))
                 {
@@ -303,7 +304,7 @@ namespace WebAPIPlugin
                     HTTPServer.Write(client, response);
                     return false;
                 }
-                if (client.Request.Headers.GetValues("Authorization")[0] != WebAPI.dis.Configuration.UserPass)
+                if (client.Request.Headers.GetValues("Authorization")[0] != WebAPI.dis.Configuration.Instance.UserPass)
                 {
                     /*{
                         "status": "error",
@@ -317,12 +318,12 @@ namespace WebAPIPlugin
                     return false;
                 }
             }
-            else if (WebAPI.dis.Configuration.AuthType == "GETQuery")
+            else if (WebAPI.dis.Configuration.Instance.AuthType == "GETQuery")
             {
                 string pass = uAPI.GetFromQuery(client.Request.Url.Query, "auth");
                 if (pass != null)
                 {
-                    if (pass != WebAPI.dis.Configuration.UserPass)
+                    if (pass != WebAPI.dis.Configuration.Instance.UserPass)
                     {
                         /*{
                             "status": "error",

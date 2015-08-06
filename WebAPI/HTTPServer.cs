@@ -14,7 +14,8 @@ using System.Text.RegularExpressions;
 using System.Xml.Serialization;
 using Rocket.API;
 using Rocket.Unturned;
-using Rocket.Unturned.Logging;
+using Rocket.Core.Logging;
+using Rocket.Core.Plugins;
 using Rocket.Unturned.Plugins;
 using Rocket.Unturned.Player;
 using SDG.Unturned;
@@ -48,13 +49,13 @@ namespace WebAPIPlugin
         public HTTPServer()
         {
             listener = new HttpListener();
-            listener.Prefixes.Add("http://*:" + WebAPI.dis.Configuration.Port + "/");
+            listener.Prefixes.Add("http://*:" + WebAPI.dis.Configuration.Instance.Port + "/");
             listener.Start();
 
             WhitelistIPs = new List<string>() { };
-            if(WebAPI.dis.Configuration.WhitelistIPs.Count > 0)
+            if(WebAPI.dis.Configuration.Instance.WhitelistIPs.Count > 0)
             {
-                foreach(var ip in WebAPI.dis.Configuration.WhitelistIPs)
+                foreach(var ip in WebAPI.dis.Configuration.Instance.WhitelistIPs)
                 {
                     WhitelistIPs.Add(ip.IP);
                 }

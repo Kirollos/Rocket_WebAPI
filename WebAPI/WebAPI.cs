@@ -14,7 +14,8 @@ using System.Text.RegularExpressions;
 using System.Xml.Serialization;
 using Rocket.API;
 using Rocket.Unturned;
-using Rocket.Unturned.Logging;
+using Rocket.Core.Logging;
+using Rocket.Core.Plugins;
 using Rocket.Unturned.Plugins;
 using Rocket.Unturned.Player;
 using SDG.Unturned;
@@ -25,22 +26,24 @@ namespace WebAPIPlugin
 {
     public class WebAPI : RocketPlugin<WebAPIConfiguration>
     {
-        public static string WebPanelFiles { get { return Rocket.Unturned.Implementation.Instance.HomeFolder + "/WebPanelFiles/"; } }
+        public static string WebPanelFiles { get { return Path.GetFullPath(".") + "/WebPanelFiles/"; } }
         public static WebAPI dis = null;
         public HTTPServer httpserver;
 
         protected override void Load()
         {
             dis = this;
-            if(!this.Configuration.Enabled)
+            if(!this.Configuration.Instance.Enabled)
             {
                 Logger.Log("WebAPI set to disabled.");
                 return;
             }
 
+            Logger.LogError(WebPanelFiles);
+
             httpserver = new HTTPServer();
 
-            if(this.Configuration.WebPanel)
+            if(this.Configuration.Instance.WebPanel)
             {
                 if (!Directory.Exists(WebPanelFiles))
                     Directory.CreateDirectory(WebPanelFiles);
@@ -50,7 +53,7 @@ namespace WebAPIPlugin
 
         protected override void Unload()
         {
-            if(this.Configuration.Enabled)
+            if(this.Configuration.Instance.Enabled)
             {
                 httpserver.listener.Stop();
                 httpserver.listener.Abort();

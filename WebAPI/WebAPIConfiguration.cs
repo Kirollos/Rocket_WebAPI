@@ -14,7 +14,8 @@ using System.Text.RegularExpressions;
 using System.Xml.Serialization;
 using Rocket.API;
 using Rocket.Unturned;
-using Rocket.Unturned.Logging;
+using Rocket.Core.Logging;
+using Rocket.Core.Plugins;
 using Rocket.Unturned.Plugins;
 using Rocket.Unturned.Player;
 using SDG.Unturned;
@@ -35,21 +36,15 @@ namespace WebAPIPlugin
         [XmlArrayItem(ElementName = "IP")] // WhitelistIP was not good ok
         public List<WebAPI_WhitelistIP> WhitelistIPs;
 
-        public IRocketPluginConfiguration DefaultConfiguration
+        public void LoadDefaults()
         {
-            get
-            {
-                return new WebAPIConfiguration()
-                {
-                    Enabled = false,
-                    Port = 0,
-                    UserPass = "user:pass",
-                    AuthType = "GETQuery",
-                    maxconnections = 5,
-                    WebPanel = false,
-                    WhitelistIPs = new List<WebAPI_WhitelistIP>() {}
-                };
-            }
+            Enabled = false;
+            Port = 0;
+            UserPass = "user:pass";
+            AuthType = "GETQuery";
+            maxconnections = 5;
+            WebPanel = false;
+            WhitelistIPs = new List<WebAPI_WhitelistIP>() { };
         }
     }
     public class WebAPI_WhitelistIP
